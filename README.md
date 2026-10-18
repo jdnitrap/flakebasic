@@ -1,0 +1,2 @@
+# flakebasic
+NixOS flake configuration
