@@ -4,8 +4,7 @@
 
 {
   services.xserver.enable = true;
-  services.displayManager.sddm.enable = true;
-  services.displayManager.sddm.wayland.enable = true;
+  # GDM from gnome.nix is the login screen. It can start Plasma too.
   services.desktopManager.plasma6.enable = true;
 
   services.gvfs.enable = true;
