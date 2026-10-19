@@ -9,7 +9,7 @@
     dates = "15:00";
     randomizedDelaySec = "0";
     allowReboot = false;
-    flake = "github:jdnitrap/flakebasic#Asus";
+    flake = "github:jdnitrap/flakebasic#${config.networking.hostName}";
     flags = [
       "--refresh"
       "--no-write-lock-file"

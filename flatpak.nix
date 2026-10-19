@@ -18,6 +18,7 @@
 
   systemd.services.flatpak-system-repo = {
     wantedBy = [ "multi-user.target" ];
+    wants = [ "network-online.target" ];
     after = [ "network-online.target" ];
     path = [ pkgs.flatpak ];
     serviceConfig.Type = "oneshot";

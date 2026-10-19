@@ -1,6 +1,6 @@
 #configuration.nix
 
-{conifg, pkgs, lib, inputs, ...}:
+{ config, pkgs, lib, ... }:
 
 {
 
@@ -17,7 +17,8 @@ imports =
 	./sound.nix
 	./state-version.nix
 	./system-packages.nix
-	./desktop-enviroment.nix
+	./gnome.nix
+	./cinnamon.nix
 	./boot.nix
 	./networking.nix
 	./user-accounts.nix
@@ -30,7 +31,9 @@ imports =
 
     ];
 
+  # Hostname and hardware stay in hosts/<name>.nix.
 
-
+  # GNOME and Cinnamon both set this. Empty wins so the build can finish.
+  environment.sessionVariables.NIX_GSETTINGS_OVERRIDES_DIR = lib.mkForce "";
 
 }
