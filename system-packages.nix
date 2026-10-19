@@ -14,6 +14,7 @@
 	gnome-software
 	gh
 	flatpak
+	wireguard-tools
 
 	];
 

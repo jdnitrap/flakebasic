@@ -12,6 +12,9 @@
 
   # Enable networking
   networking.networkmanager.enable = true;
+  networking.networkmanager.plugins = with pkgs; [
+    networkmanager-openvpn
+  ];
 
  # Enable the OpenSSH daemon.
    services.openssh.enable = false;
@@ -21,6 +24,7 @@
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
    networking.firewall.enable = true;
-
+   # Required for Proton VPN and other WireGuard clients.
+   networking.firewall.checkReversePath = false;
 
 }
