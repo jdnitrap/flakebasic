@@ -37,4 +37,10 @@ imports =
   # GNOME and Cinnamon both set this. Empty wins so the build can finish.
   environment.sessionVariables.NIX_GSETTINGS_OVERRIDES_DIR = lib.mkForce "";
 
+  # Plasma would otherwise become the default login session.
+  services.displayManager.defaultSession = lib.mkForce "gnome";
+
+  # Plasma and GNOME both want the SSH password prompt.
+  programs.ssh.askPassword = lib.mkForce "${pkgs.seahorse}/libexec/seahorse/ssh-askpass";
+
 }
