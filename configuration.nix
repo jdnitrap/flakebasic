@@ -35,9 +35,8 @@ imports =
 
   # Hostname and hardware stay in hosts/<name>.nix.
 
-  # LightDM starts GNOME, Cinnamon, and Plasma.
+  # LightDM starts GNOME, Cinnamon, and Plasma. The module picks the GTK greeter.
   services.xserver.displayManager.lightdm.enable = true;
-  services.xserver.displayManager.lightdm.greeters.gtk.enable = true;
 
   # GNOME and Cinnamon both set this. Empty wins so the build can finish.
   environment.sessionVariables.NIX_GSETTINGS_OVERRIDES_DIR = lib.mkForce "";
