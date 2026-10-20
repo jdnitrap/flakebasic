@@ -5,7 +5,7 @@
 let
   dashboard = pkgs.writeScriptBin "apparmor-dashboard" ''
     #!${pkgs.python3}/bin/python3
-    import json, subprocess, urllib.parse
+    import json, subprocess
     from http.server import BaseHTTPRequestHandler, HTTPServer
 
     PORT = 8088
@@ -28,7 +28,6 @@ let
                 return items
             except Exception:
                 pass
-        # Fallback text parse
         items = []
         for line in run(["aa-status"]).splitlines():
             line = line.strip()
@@ -85,11 +84,11 @@ async function load() {
   const d = await (await fetch('/api/denials')).json();
   document.getElementById('profiles').innerHTML = p.map(x => `
     <div class="row">
-      <span>${x.name}</span>
+      <span>''${x.name}</span>
       <span>
-        <span class="mode ${x.mode}">${x.mode}</span>
-        <button onclick="switchMode('${x.name}','${x.mode === 'enforce' ? 'complain' : 'enforce'}')">
-          ${x.mode === 'enforce' ? 'to complain' : 'to enforce'}
+        <span class="mode ''${x.mode}">''${x.mode}</span>
+        <button onclick="switchMode(''${x.name},''${x.mode === 'enforce' ? 'complain' : 'enforce'})">
+          ''${x.mode === 'enforce' ? 'to complain' : 'to enforce'}
         </button>
       </span>
     </div>`).join('') || 'No profiles loaded.';
@@ -152,7 +151,6 @@ in
 {
   environment.systemPackages = [ dashboard switch pkgs.apparmor-utils ];
 
-  # Desktop entry so it shows in the app grid.
   environment.etc."xdg/applications/apparmor-dashboard.desktop".text = ''
     [Desktop Entry]
     Type=Application
@@ -165,7 +163,6 @@ in
     StartupNotify=true
   '';
 
-  # Local-only dashboard, started for each logged-in user.
   systemd.user.services.apparmor-dashboard = {
     description = "AppArmor local dashboard";
     wantedBy = [ "default.target" ];
@@ -175,7 +172,6 @@ in
     };
   };
 
-  # Allow wheel users to switch profile modes without a full root shell.
   security.polkit.extraConfig = ''
     polkit.addRule(function(action, subject) {
       if (action.id == "org.freedesktop.policykit.exec" &&
