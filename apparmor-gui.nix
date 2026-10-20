@@ -80,22 +80,18 @@ let
 </main>
 <script>
 async function load() {
-  const p = await (await fetch('/api/status')).json();
-  const d = await (await fetch('/api/denials')).json();
-  document.getElementById('profiles').innerHTML = p.map(x => `
-    <div class="row">
-      <span>''${x.name}</span>
-      <span>
-        <span class="mode ''${x.mode}">''${x.mode}</span>
-        <button onclick="switchMode(''${x.name},''${x.mode === 'enforce' ? 'complain' : 'enforce'})">
-          ''${x.mode === 'enforce' ? 'to complain' : 'to enforce'}
-        </button>
-      </span>
-    </div>`).join('') || 'No profiles loaded.';
-  document.getElementById('denials').textContent = d.join('\n') || 'No denials this boot.';
+  const p = await (await fetch("/api/status")).json();
+  const d = await (await fetch("/api/denials")).json();
+  const rows = p.map(function(x) {
+    var next = x.mode === "enforce" ? "complain" : "enforce";
+    var label = x.mode === "enforce" ? "to complain" : "to enforce";
+    return "<div class=\"row\"><span>" + x.name + "</span><span><span class=\"mode " + x.mode + "\">" + x.mode + "</span> <button onclick=\"switchMode('" + x.name + "','" + next + "')\">" + label + "</button></span></div>";
+  }).join("");
+  document.getElementById("profiles").innerHTML = rows || "No profiles loaded.";
+  document.getElementById("denials").textContent = d.join("\n") || "No denials this boot.";
 }
 async function switchMode(name, mode) {
-  await fetch('/api/switch', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({name, mode}) });
+  await fetch("/api/switch", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({name: name, mode: mode}) });
   load();
 }
 load();
