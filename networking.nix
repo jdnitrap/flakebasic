@@ -19,12 +19,11 @@
  # Enable the OpenSSH daemon.
    services.openssh.enable = false;
 
-# Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-   networking.firewall.enable = true;
-   # Required for Proton VPN and other WireGuard clients.
-   networking.firewall.checkReversePath = false;
+  # firewalld replaces the built-in firewall. Do not enable both.
+  networking.firewall.enable = false;
+
+  services.firewalld.enable = true;
+  # Printer discovery only on the home zone. Public stays closed.
+  services.firewalld.zones.home.services = [ "mdns" ];
 
 }

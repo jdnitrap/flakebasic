@@ -15,6 +15,7 @@
 	gh
 	flatpak
 	wireguard-tools
+	firewall-config
 
 	];
 
