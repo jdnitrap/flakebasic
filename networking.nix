@@ -21,6 +21,8 @@
 
   # firewalld replaces the built-in firewall. Do not enable both.
   networking.firewall.enable = false;
+  # firewalld uses nftables by default.
+  networking.nftables.enable = true;
 
   services.firewalld.enable = true;
   # Printer discovery only on the home zone. Public stays closed.
