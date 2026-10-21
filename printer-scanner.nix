@@ -12,8 +12,7 @@
   services.avahi = {
   enable = true;
   nssmdns4 = true;
-  # firewalld owns the ports. mDNS is opened in the home zone.
-  openFirewall = false;
+  openFirewall = true;
 };
 
 services.printing.drivers = with pkgs; [

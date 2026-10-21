@@ -15,7 +15,7 @@
 	gh
 	flatpak
 	wireguard-tools
-	firewalld
+	opensnitch-ui
 
 	];
 

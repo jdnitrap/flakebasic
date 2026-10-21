@@ -19,22 +19,20 @@
  # Enable the OpenSSH daemon.
    services.openssh.enable = false;
 
-  # firewalld replaces the built-in firewall. Do not enable both.
-  networking.firewall.enable = false;
-  # firewalld uses nftables by default.
-  networking.nftables.enable = true;
+  # Port firewall stays on. OpenSnitch asks per app on top of it.
+  networking.firewall.enable = true;
+  # Required for Proton VPN and other WireGuard clients.
+  networking.firewall.checkReversePath = false;
 
-  services.firewalld.enable = true;
-  # Printer discovery only on the home zone. Public stays closed.
-  services.firewalld.zones.home.services = [ "mdns" ];
+  services.opensnitch.enable = true;
 
-  # Desktop entry so the GUI shows in the app grid.
-  environment.etc."xdg/applications/firewall-config.desktop".text = ''
+  # Desktop entry so the UI shows in the app grid.
+  environment.etc."xdg/applications/opensnitch-ui.desktop".text = ''
     [Desktop Entry]
     Type=Application
-    Name=Firewall
-    Comment=Configure the firewall
-    Exec=${pkgs.firewalld}/bin/firewall-config
+    Name=OpenSnitch
+    Comment=Application firewall
+    Exec=${pkgs.opensnitch-ui}/bin/opensnitch-ui
     Icon=security-high
     Terminal=false
     Categories=System;Settings;Security;
