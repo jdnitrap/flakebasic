@@ -39,4 +39,16 @@
     StartupNotify=true
   '';
 
+  # Start the UI for every logged-in user.
+  environment.etc."xdg/autostart/opensnitch-ui.desktop".text = ''
+    [Desktop Entry]
+    Type=Application
+    Name=OpenSnitch
+    Comment=Application firewall
+    Exec=${pkgs.opensnitch-ui}/bin/opensnitch-ui
+    Icon=security-high
+    Terminal=false
+    X-GNOME-Autostart-enabled=true
+  '';
+
 }
