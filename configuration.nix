@@ -19,7 +19,6 @@ imports =
 	./system-packages.nix
 	./gnome.nix
 	./cinnamon.nix
-	./plasma6.nix
 	./boot.nix
 	./networking.nix
 	./user-accounts.nix
@@ -35,16 +34,16 @@ imports =
 
   # Hostname and hardware stay in hosts/<name>.nix.
 
-  # LightDM starts GNOME, Cinnamon, and Plasma. The module picks the GTK greeter.
+  # LightDM starts GNOME and Cinnamon. The module picks the GTK greeter.
   services.xserver.displayManager.lightdm.enable = true;
 
   # GNOME and Cinnamon both set this. Empty wins so the build can finish.
   environment.sessionVariables.NIX_GSETTINGS_OVERRIDES_DIR = lib.mkForce "";
 
-  # Plasma would otherwise become the default login session.
+  # GNOME stays the default login session.
   services.displayManager.defaultSession = lib.mkForce "gnome";
 
-  # Plasma and GNOME both want the SSH password prompt.
+  # GNOME gets the SSH password prompt.
   programs.ssh.askPassword = lib.mkForce "${pkgs.seahorse}/libexec/seahorse/ssh-askpass";
 
 }
