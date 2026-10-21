@@ -21,7 +21,6 @@ Hidden=true
 in
 {
   services.xserver.enable = true;
-  services.xserver.excludePackages = [ pkgs.xterm ];
   services.desktopManager.gnome.enable = true;
 
   services.gnome.core-apps.enable = false;
