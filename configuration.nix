@@ -33,9 +33,6 @@ imports =
 
   # Hostname and hardware stay in hosts/<name>.nix.
 
-  # LightDM starts GNOME. The module picks the GTK greeter.
-  services.xserver.displayManager.lightdm.enable = true;
-
   # GNOME stays the default login session.
   services.displayManager.defaultSession = lib.mkForce "gnome";
 
