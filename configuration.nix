@@ -18,7 +18,6 @@ imports =
 	./state-version.nix
 	./system-packages.nix
 	./gnome.nix
-	./cinnamon.nix
 	./boot.nix
 	./networking.nix
 	./user-accounts.nix
@@ -34,11 +33,8 @@ imports =
 
   # Hostname and hardware stay in hosts/<name>.nix.
 
-  # LightDM starts GNOME and Cinnamon. The module picks the GTK greeter.
+  # LightDM starts GNOME. The module picks the GTK greeter.
   services.xserver.displayManager.lightdm.enable = true;
-
-  # GNOME and Cinnamon both set this. Empty wins so the build can finish.
-  environment.sessionVariables.NIX_GSETTINGS_OVERRIDES_DIR = lib.mkForce "";
 
   # GNOME stays the default login session.
   services.displayManager.defaultSession = lib.mkForce "gnome";
