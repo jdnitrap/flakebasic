@@ -28,4 +28,17 @@
   # Printer discovery only on the home zone. Public stays closed.
   services.firewalld.zones.home.services = [ "mdns" ];
 
+  # Desktop entry so the GUI shows in the app grid.
+  environment.etc."xdg/applications/firewall-config.desktop".text = ''
+    [Desktop Entry]
+    Type=Application
+    Name=Firewall
+    Comment=Configure the firewall
+    Exec=${pkgs.firewalld}/bin/firewall-config
+    Icon=security-high
+    Terminal=false
+    Categories=System;Settings;Security;
+    StartupNotify=true
+  '';
+
 }
