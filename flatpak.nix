@@ -11,11 +11,16 @@
     { appId = "org.mozilla.firefox"; origin = "flathub"; }
   ];
 
-  # Updates run with nobody at the keyboard. New installs still ask.
   security.polkit.extraConfig = ''
     polkit.addRule(function(action, subject) {
       if (action.id == "org.freedesktop.Flatpak.app-update" ||
           action.id == "org.freedesktop.Flatpak.runtime-update") {
+        return polkit.Result.YES;
+      }
+
+      # GNOME Software metadata refresh.
+      if (action.id == "org.freedesktop.packagekit.system-sources-refresh" &&
+          subject.isInGroup("wheel")) {
         return polkit.Result.YES;
       }
 
