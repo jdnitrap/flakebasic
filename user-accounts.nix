@@ -10,4 +10,11 @@ users.users."user1" = {
     extraGroups = [ "networkmanager" "wheel" "lp" "scanner" ];
   };
 
+# No wheel. Used to test user-level Flatpak installs.
+users.users."test" = {
+    isNormalUser = true;
+    description = "test";
+    extraGroups = [ "networkmanager" ];
+  };
+
 }
