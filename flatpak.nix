@@ -11,21 +11,6 @@
     { appId = "org.mozilla.firefox"; origin = "flathub"; }
   ];
 
-  # User install for the test account only. Runs in the background at login.
-  systemd.user.services.flatpak-user-install = {
-    description = "Install user Flatpaks";
-    wantedBy = [ "default.target" ];
-    after = [ "network-online.target" ];
-    wants = [ "network-online.target" ];
-    path = [ pkgs.flatpak ];
-    serviceConfig.Type = "oneshot";
-    script = ''
-      [ "$(id -un)" = "test" ] || exit 0
-      flatpak remote-add --if-not-exists --user flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-      flatpak install --user -y flathub org.gnome.Calculator || true
-    '';
-  };
-
   security.polkit.extraConfig = ''
     polkit.addRule(function(action, subject) {
       if (action.id == "org.freedesktop.Flatpak.app-update" ||
