@@ -1,31 +1,15 @@
 #flatpak.nix
 
-{ config, lib, pkgs, inputs, ... }:
+{ config, lib, pkgs, ... }:
 
 {
   services.flatpak.enable = true;
 
-  systemd.user.services.flatpak-repo = {
-    wantedBy = [ "default.target" ];
-    wants = [ "network-online.target" ];
-    after = [ "network-online.target" ];
-    path = [ pkgs.flatpak ];
-    serviceConfig.Type = "oneshot";
-    script = ''
-      flatpak remote-add --if-not-exists --user flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-    '';
-  };
-
-  systemd.services.flatpak-system-repo = {
-    wantedBy = [ "multi-user.target" ];
-    wants = [ "network-online.target" ];
-    after = [ "network-online.target" ];
-    path = [ pkgs.flatpak ];
-    serviceConfig.Type = "oneshot";
-    script = ''
-      flatpak remote-add --if-not-exists --system flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-    '';
-  };
+  # Declarative installs. Add app IDs here.
+  services.flatpak.packages = [
+    # { appId = "org.mozilla.firefox"; origin = "flathub"; }
+    # "com.spotify.Client"
+  ];
 
   # Updates run with nobody at the keyboard. New installs still ask.
   security.polkit.extraConfig = ''
@@ -43,40 +27,4 @@
       }
     });
   '';
-
-  systemd.services.flatpak-system-update = {
-    description = "Update system Flatpaks";
-    after = [ "network-online.target" ];
-    wants = [ "network-online.target" ];
-    path = [ pkgs.flatpak ];
-    serviceConfig.Type = "oneshot";
-    script = "flatpak update --system --noninteractive --assumeyes || true";
-  };
-
-  systemd.timers.flatpak-system-update = {
-    wantedBy = [ "timers.target" ];
-    timerConfig = {
-      OnCalendar = "daily";
-      Persistent = true;
-      RandomizedDelaySec = "1h";
-    };
-  };
-
-  systemd.user.services.flatpak-user-update = {
-    description = "Update user Flatpaks";
-    after = [ "network-online.target" ];
-    wants = [ "network-online.target" ];
-    path = [ pkgs.flatpak ];
-    serviceConfig.Type = "oneshot";
-    script = "flatpak update --user --noninteractive --assumeyes || true";
-  };
-
-  systemd.user.timers.flatpak-user-update = {
-    wantedBy = [ "timers.target" ];
-    timerConfig = {
-      OnCalendar = "daily";
-      Persistent = true;
-      RandomizedDelaySec = "1h";
-    };
-  };
 }
