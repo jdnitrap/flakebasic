@@ -8,6 +8,7 @@
   # Declarative installs. Add app IDs here.
   services.flatpak.packages = [
     { appId = "app.zen_browser.zen"; origin = "flathub"; }
+    { appId = "org.mozilla.firefox"; origin = "flathub"; }
   ];
 
   # Updates run with nobody at the keyboard. New installs still ask.
