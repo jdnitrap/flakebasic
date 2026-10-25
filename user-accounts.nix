@@ -13,5 +13,10 @@ users.users."nimda" = {
     ];
   };
 
+users.users."user1" = {
+    isNormalUser = true;
+    description = "user1";
+    extraGroups = [ "networkmanager" "wheel" "lp" "scanner" ];
+  };
 
 }
