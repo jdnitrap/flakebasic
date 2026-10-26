@@ -28,6 +28,7 @@ imports =
 	./apparmor.nix
 	./apparmor-gui.nix
 	./auto-login.nix
+	./adguard.nix
 
     ];
 
