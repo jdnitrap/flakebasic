@@ -1,6 +1,6 @@
 #auto-login.nix
 # Settings -> System -> Users owns the switch.
-# A service copies that choice into GDM before the login screen starts.
+# A service overlays GDM's config with that choice before the login screen.
 
 { config, pkgs, lib, ... }:
 
@@ -20,16 +20,18 @@
     });
   '';
 
-  # Read AccountsService and write the chosen user into GDM.
   systemd.services.gdm-autologin-bridge = {
     description = "Apply AccountsService auto-login to GDM";
     before = [ "display-manager.service" ];
     wantedBy = [ "display-manager.service" ];
-    serviceConfig.Type = "oneshot";
-    path = [ pkgs.gawk pkgs.gnugrep pkgs.coreutils ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+    };
+    path = [ pkgs.gawk pkgs.gnugrep pkgs.coreutils pkgs.util-linux ];
     script = ''
-      conf=/etc/gdm/custom.conf
-      [ -f "$conf" ] || exit 0
+      mkdir -p /run/gdm
+      conf=/run/gdm/custom.conf
 
       user=""
       for f in /var/lib/AccountsService/users/*; do
@@ -40,18 +42,23 @@
         fi
       done
 
-      # Drop any previous bridge lines, then add the current choice.
-      tmp=$(mktemp)
-      grep -v -E '^(AutomaticLoginEnable|AutomaticLogin)=' "$conf" > "$tmp" || true
-      if [ -n "$user" ]; then
-        awk -v u="$user" '
-          /^\[daemon\]/ { print; print "AutomaticLoginEnable=true"; print "AutomaticLogin=" u; next }
-          { print }
-        ' "$tmp" > "$conf"
-      else
-        cat "$tmp" > "$conf"
-      fi
-      rm -f "$tmp"
+      {
+        echo "[daemon]"
+        echo "WaylandEnable=true"
+        if [ -n "$user" ]; then
+          echo "AutomaticLoginEnable=true"
+          echo "AutomaticLogin=$user"
+        fi
+        echo "[security]"
+        echo "[xdmcp]"
+        echo "[greeter]"
+        echo "[chooser]"
+        echo "[debug]"
+      } > "$conf"
+
+      # Nix owns /etc/gdm/custom.conf. Cover it with the runtime file.
+      mountpoint -q /etc/gdm/custom.conf || mount --bind "$conf" /etc/gdm/custom.conf
+      logger -t gdm-autologin-bridge "auto-login user: ''${user:-none}"
     '';
   };
 }
