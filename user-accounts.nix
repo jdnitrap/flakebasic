@@ -4,10 +4,6 @@
 
 {
 
-users.users."user1" = {
-    isNormalUser = true;
-    description = "user1";
-    extraGroups = [ "networkmanager" "wheel" "lp" "scanner" ];
-  };
+# No declarative users. Accounts created on the machine stay.
 
 }
