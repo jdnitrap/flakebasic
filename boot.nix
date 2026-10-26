@@ -8,6 +8,9 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
+  # Keep the boot menu short. Older generations are dropped from the menu.
+  boot.loader.systemd-boot.configurationLimit = 10;
+
   # Splash after the generation menu. Hides the boot text.
   boot.plymouth.enable = true;
   boot.plymouth.theme = "circuit";
