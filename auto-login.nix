@@ -10,10 +10,11 @@
 
   # Do not set services.displayManager.autoLogin. That would lock the switch.
 
-  # Any logged-in local user may toggle automatic login.
+  # The panel uses set-login-option, not user-administration, to save the switch.
   security.polkit.extraConfig = ''
     polkit.addRule(function(action, subject) {
-      if (action.id == "org.freedesktop.accounts.user-administration" &&
+      if ((action.id == "org.freedesktop.accounts.user-administration" ||
+           action.id == "org.freedesktop.accounts.set-login-option") &&
           subject.active && subject.local) {
         return polkit.Result.YES;
       }
