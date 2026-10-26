@@ -10,9 +10,11 @@
 
   # Splash after the generation menu. Hides the boot text.
   boot.plymouth.enable = true;
-  boot.plymouth.theme = "coffee";
+  boot.plymouth.theme = "circuit";
   boot.plymouth.themePackages = [
-    (pkgs.callPackage ./plymouth/coffee.nix {})
+    (pkgs.adi1090x-plymouth-themes.override {
+      selected_themes = [ "circuit" ];
+    })
   ];
 
   # Quiet the rundown so the splash is what you see.
