@@ -34,6 +34,11 @@ in
     gnome-shell-extensions
   ];
 
+  # GNOME hides Log Out with one account and one session. Show it anyway.
+  programs.dconf.profiles.user.databases = [{
+    settings."org/gnome/shell".always-show-log-out = true;
+  }];
+
   # Trash, mounts, and network locations for any file manager.
   services.gvfs.enable = true;
 
@@ -57,8 +62,8 @@ in
       [ -d "$home" ] || continue
       dir="$home/.local/share/applications"
       mkdir -p "$dir"
-      cp -f ${hiddenDesktop "shell"} "$dir/org.gnome.Shell.Extensions.desktop"
-      cp -f ${hiddenDesktop "app"} "$dir/org.gnome.Extensions.desktop"
+      cp -f ${hiddenDesktop "shell"} $dir/org.gnome.Shell.Extensions.desktop
+      cp -f ${hiddenDesktop "app"} $dir/org.gnome.Extensions.desktop
       chown --reference="$home" "$dir" "$dir/org.gnome.Shell.Extensions.desktop" "$dir/org.gnome.Extensions.desktop"
     done
   '';
