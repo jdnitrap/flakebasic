@@ -1,18 +1,17 @@
-{ stdenvNoCC, lib, imagemagick }: 
+{ stdenvNoCC, lib }: 
 
 stdenvNoCC.mkDerivation {
   pname = "plymouth-theme-coffee";
   version = "1.0";
   src = ./coffee;
 
-  nativeBuildInputs = [ imagemagick ];
-
   installPhase = ''
     mkdir -p $out/share/plymouth/themes/coffee
     cp coffee.plymouth coffee.script $out/share/plymouth/themes/coffee/
 
-    base64 -d frame.b64 > /tmp/frame.jpg
-    magick /tmp/frame.jpg $out/share/plymouth/themes/coffee/frame.png
+    for i in 1 2 3 4 5 6; do
+      base64 -d frames/frame_$i.b64 > $out/share/plymouth/themes/coffee/frame_$i.png
+    done
 
     sed -i "s@/usr/share@$out/share@g" $out/share/plymouth/themes/coffee/coffee.plymouth
   '';

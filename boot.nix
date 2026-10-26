@@ -10,6 +10,10 @@
 
   # Splash after the generation menu. Hides the boot text.
   boot.plymouth.enable = true;
+  boot.plymouth.theme = "coffee";
+  boot.plymouth.themePackages = [
+    (pkgs.callPackage ./plymouth/coffee.nix {})
+  ];
 
   # Quiet the rundown so the splash is what you see.
   boot.consoleLogLevel = 3;
