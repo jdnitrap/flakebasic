@@ -1,6 +1,7 @@
 #auto-login.nix
 # Settings -> System -> Users owns the switch.
-# A service overlays GDM's config with that choice before the login screen.
+# AccountsService writes /etc/gdm/custom.conf. Nix makes that file read-only,
+# so we keep a writable copy mounted over it.
 
 { config, pkgs, lib, ... }:
 
@@ -10,7 +11,6 @@
 
   # Do not set services.displayManager.autoLogin. That would lock the switch.
 
-  # The panel uses set-login-option, not user-administration, to save the switch.
   security.polkit.extraConfig = ''
     polkit.addRule(function(action, subject) {
       if ((action.id == "org.freedesktop.accounts.user-administration" ||
@@ -22,9 +22,9 @@
   '';
 
   systemd.services.gdm-autologin-bridge = {
-    description = "Apply AccountsService auto-login to GDM";
-    before = [ "display-manager.service" ];
-    wantedBy = [ "display-manager.service" ];
+    description = "Writable GDM config for the Users panel auto-login switch";
+    before = [ "display-manager.service" "accounts-daemon.service" ];
+    wantedBy = [ "multi-user.target" ];
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;
@@ -32,8 +32,19 @@
     path = [ pkgs.gawk pkgs.gnugrep pkgs.coreutils pkgs.util-linux ];
     script = ''
       mkdir -p /run/gdm
-      conf=/run/gdm/custom.conf
+      live=/run/gdm/custom.conf
+      target=/etc/gdm/custom.conf
 
+      # Start from the Nix file if we do not already have a runtime copy.
+      if [ ! -f "$live" ]; then
+        if [ -f "$target" ]; then
+          cat "$target" > "$live"
+        else
+          printf '%s\n' '[daemon]' 'WaylandEnable=true' '[security]' '[xdmcp]' '[greeter]' '[chooser]' '[debug]' > "$live"
+        fi
+      fi
+
+      # Apply any AccountsService flag that was saved by hand or by a previous panel write.
       user=""
       for f in /var/lib/AccountsService/users/*; do
         [ -f "$f" ] || continue
@@ -43,23 +54,20 @@
         fi
       done
 
-      {
-        echo "[daemon]"
-        echo "WaylandEnable=true"
-        if [ -n "$user" ]; then
-          echo "AutomaticLoginEnable=true"
-          echo "AutomaticLogin=$user"
-        fi
-        echo "[security]"
-        echo "[xdmcp]"
-        echo "[greeter]"
-        echo "[chooser]"
-        echo "[debug]"
-      } > "$conf"
+      if [ -n "$user" ]; then
+        tmp=$(mktemp)
+        grep -v -E '^(AutomaticLoginEnable|AutomaticLogin)=' "$live" > "$tmp" || true
+        awk -v u="$user" '
+          /^\[daemon\]/ { print; print "AutomaticLoginEnable=true"; print "AutomaticLogin=" u; next }
+          { print }
+        ' "$tmp" > "$live"
+        rm -f "$tmp"
+      fi
 
-      # Nix owns /etc/gdm/custom.conf. Cover it with the runtime file.
-      mountpoint -q /etc/gdm/custom.conf || mount --bind "$conf" /etc/gdm/custom.conf
-      logger -t gdm-autologin-bridge "auto-login user: ''${user:-none}"
+      # AccountsService must be able to write this file when the switch is flipped.
+      mountpoint -q "$target" || mount --bind "$live" "$target"
+      chmod 644 "$live"
+      logger -t gdm-autologin-bridge "mounted writable custom.conf; auto-login user: ''${user:-none}"
     '';
   };
 }
