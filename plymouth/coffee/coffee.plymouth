@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=Coffee
+Description=Coffee tech splash
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/coffee
+ScriptFile=/usr/share/plymouth/themes/coffee/coffee.script

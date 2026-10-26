@@ -1,0 +1,23 @@
+Window.SetBackgroundTopColor(0.04, 0.04, 0.05);
+Window.SetBackgroundBottomColor(0.04, 0.04, 0.05);
+
+for (i = 0; i < 8; i++)
+  frames[i] = Image("frame_" + (i + 1) + ".png");
+
+sprite = Sprite();
+sprite.SetImage(frames[0]);
+
+progress = 0;
+
+fun refresh_callback() {
+  screen_w = Window.GetWidth();
+  screen_h = Window.GetHeight();
+  img_w = frames[0].GetWidth();
+  img_h = frames[0].GetHeight();
+  sprite.SetX(screen_w / 2 - img_w / 2);
+  sprite.SetY(screen_h / 2 - img_h / 2);
+  sprite.SetImage(frames[Math.Int(progress / 5) % 8]);
+  progress++;
+}
+
+Plymouth.SetRefreshFunction(refresh_callback);
