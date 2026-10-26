@@ -10,5 +10,19 @@
 
   # Splash after the generation menu. Hides the boot text.
   boot.plymouth.enable = true;
+  boot.plymouth.theme = "coffee";
+  boot.plymouth.themePackages = [
+    (pkgs.callPackage ./plymouth/coffee.nix {})
+  ];
+
+  # Quiet the rundown so the splash is what you see.
+  boot.consoleLogLevel = 3;
+  boot.initrd.verbose = false;
+  boot.kernelParams = [
+    "quiet"
+    "splash"
+    "rd.systemd.show_status=auto"
+    "rd.udev.log_level=3"
+  ];
 
 }
