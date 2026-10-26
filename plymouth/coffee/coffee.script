@@ -1,7 +1,7 @@
 Window.SetBackgroundTopColor(0.04, 0.04, 0.05);
 Window.SetBackgroundBottomColor(0.04, 0.04, 0.05);
 
-for (i = 0; i < 6; i++)
+for (i = 0; i < 8; i++)
   frames[i] = Image("frame_" + (i + 1) + ".png");
 
 sprite = Sprite();
@@ -16,7 +16,7 @@ fun refresh_callback() {
   img_h = frames[0].GetHeight();
   sprite.SetX(screen_w / 2 - img_w / 2);
   sprite.SetY(screen_h / 2 - img_h / 2);
-  sprite.SetImage(frames[Math.Int(progress / 5) % 6]);
+  sprite.SetImage(frames[Math.Int(progress / 4) % 8]);
   progress++;
 }
 

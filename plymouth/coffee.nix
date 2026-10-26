@@ -9,7 +9,7 @@ stdenvNoCC.mkDerivation {
     mkdir -p $out/share/plymouth/themes/coffee
     cp coffee.plymouth coffee.script $out/share/plymouth/themes/coffee/
 
-    for i in 1 2 3 4 5 6; do
+    for i in 1 2 3 4 5 6 7 8; do
       base64 -d frames/frame_$i.b64 > $out/share/plymouth/themes/coffee/frame_$i.png
     done
 
@@ -17,7 +17,7 @@ stdenvNoCC.mkDerivation {
   '';
 
   meta = with lib; {
-    description = "Coffee tech Plymouth splash";
+    description = "Spinning circle Plymouth splash";
     platforms = platforms.linux;
   };
 }
