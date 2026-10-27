@@ -3,7 +3,11 @@
 {config, lib, pkgs, inputs, ... }:
 
 {
+  users.mutableUsers = true;
 
-# No declarative users. Accounts created on the machine stay.
-
+  users.users.admin = {
+    isNormalUser = true;
+    description = "Admin";
+    extraGroups = [ "wheel" "networkmanager" "video" "audio" ];
+  };
 }
