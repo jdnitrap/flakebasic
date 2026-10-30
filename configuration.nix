@@ -18,7 +18,6 @@ imports =
 	./state-version.nix
 	./system-packages.nix
 	./gnome.nix
-	./plasma6.nix
 	./boot.nix
 	./networking.nix
 	./user-accounts.nix
