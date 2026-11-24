@@ -11,6 +11,7 @@
     allowReboot = false;
     flake = "github:jdnitrap/flakebasic#${config.networking.hostName}";
     flags = [
+      "--impure"
       "--refresh"
       "--no-write-lock-file"
       "--option" "build-cores" "1"

@@ -3,7 +3,7 @@
 { config, pkgs, lib, ... }:
 
 {
-  imports = [ ./minilap-hardware.nix ];
+  imports = [ ../gnome.nix ];
 
   networking.hostName = "minilap";
 }

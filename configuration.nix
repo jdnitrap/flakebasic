@@ -17,7 +17,6 @@ imports =
 	./sound.nix
 	./state-version.nix
 	./system-packages.nix
-	./gnome.nix
 	./boot.nix
 	./networking.nix
 	./user-accounts.nix
@@ -26,18 +25,16 @@ imports =
 	./experimental-features.nix
 	./laptop.nix
 	./apparmor.nix
-	./apparmor-gui.nix
 	./auto-login.nix
 	./adguard.nix
 
     ];
 
-  # Hostname and hardware stay in hosts/<name>.nix.
+  # Hostname stays in hosts/<name>.nix.
+  # Hardware is /etc/nixos/hardware.nix on the computer being built.
+  # Desktop stays in the host file. Nextcloud is only imported by inixos.
 
-  # GNOME stays the default login session.
-  services.displayManager.defaultSession = lib.mkForce "gnome";
-
-  # GNOME gets the SSH password prompt.
-  programs.ssh.askPassword = lib.mkForce "${pkgs.seahorse}/libexec/seahorse/ssh-askpass";
+  # The window comes from github:jdnitrap/apparmor-gui.
+  services.apparmor-gui.enable = true;
 
 }

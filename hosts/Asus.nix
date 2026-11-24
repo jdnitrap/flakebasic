@@ -3,7 +3,7 @@
 { config, pkgs, lib, ... }:
 
 {
-  imports = [ ../hardware-configuration.nix ];
+  imports = [ ../gnome.nix ];
 
   networking.hostName = "Asus";
 }

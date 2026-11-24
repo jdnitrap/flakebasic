@@ -6,6 +6,10 @@
   services.xserver.enable = true;
   services.displayManager.gdm.enable = true;
   services.desktopManager.gnome.enable = true;
+  services.displayManager.defaultSession = "gnome";
+
+  # GNOME gets the SSH password prompt.
+  programs.ssh.askPassword = "${pkgs.seahorse}/libexec/seahorse/ssh-askpass";
 
   services.gnome.core-apps.enable = false;
   services.gnome.core-developer-tools.enable = false;
