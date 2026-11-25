@@ -38,16 +38,22 @@ let
     nameserver 9.9.9.9
   '';
 
+  # A user namespace makes the process a fake root. Nix then fails with
+  # "remounting /nix/store writable: Operation not permitted". Only a real
+  # root process may mount the direct resolver. Everyone else uses AdGuard.
   wrap-nix = real: pkgs.writeShellScriptBin (baseNameOf real) ''
     set +e
-    ${pkgs.util-linux}/bin/unshare --user --mount --map-root-user ${pkgs.bash}/bin/bash -c '
-      if ! mount --bind "$1" /etc/resolv.conf; then
-        exit 86
-      fi
-      shift
-      exec "$@"
-    ' _ ${nix-resolv} ${real} "$@"
-    status=$?
+    status=86
+    if [ "$(${pkgs.coreutils}/bin/id -u)" -eq 0 ]; then
+      ${pkgs.util-linux}/bin/unshare --mount --propagation private ${pkgs.bash}/bin/bash -c '
+        if ! mount --bind "$1" /etc/resolv.conf; then
+          exit 86
+        fi
+        shift
+        exec "$@"
+      ' _ ${nix-resolv} ${real} "$@"
+      status=$?
+    fi
     set -e
     if [ "$status" -eq 86 ]; then
       echo "nix direct DNS was not available; using the system resolver" >&2
