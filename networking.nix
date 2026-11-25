@@ -16,12 +16,12 @@
     networkmanager-openvpn
   ];
 
-  # Enable the OpenSSH daemon.
-  services.openssh.enable = false;
+  # Enable the OpenSSH daemon. A host can turn it on.
+  services.openssh.enable = lib.mkDefault false;
 
   # NixOS firewall.
   networking.firewall.enable = true;
-  # Required for Proton VPN and other WireGuard clients.
-  networking.firewall.checkReversePath = false;
+  # Required for Proton VPN and other WireGuard clients. A host can set loose mode.
+  networking.firewall.checkReversePath = lib.mkDefault false;
 
 }
