@@ -28,22 +28,15 @@ let
     echo "Lasting undo, from this keyboard, with no network: run0 nixos-rebuild switch --rollback"
     echo "Or pick the previous generation in the boot menu."
   '';
-in
-{
-  environment.systemPackages = [ restore-network ];
 
-  # The adguardhome user is created when that service starts. The firewall
-  # must wait for it, or `id` fails and the whole firewall aborts.
-  systemd.services.firewall = {
-    after = [ "adguardhome.service" ];
-    wants = [ "adguardhome.service" ];
-  };
-
-  networking.firewall.extraCommands = ''
+  # Installed by the firewall when the AdGuard user already exists, and again
+  # by nixos-dns-lock.service once that user has been created at boot.
+  install-dns-lock = pkgs.writeShellScriptBin "install-dns-lock" ''
+    export PATH="${pkgs.iptables}/bin:${pkgs.coreutils}/bin:$PATH"
     aguid=$(id -u adguardhome 2>/dev/null || true)
     if [ -z "$aguid" ]; then
-      echo "adguardhome user is not available; DNS lock was not installed" >&2
-      exit 1
+      echo "adguardhome user is not available yet; DNS lock was not installed" >&2
+      exit 0
     fi
     iptables -w -N nixos-dns-lock 2>/dev/null || true
     iptables -w -F nixos-dns-lock
@@ -67,6 +60,27 @@ in
     ip6tables -w -A nixos-dns-lock -p tcp --dport 853 -j REJECT
     ip6tables -w -C OUTPUT -j nixos-dns-lock 2>/dev/null || ip6tables -w -A OUTPUT -j nixos-dns-lock
   '';
+in
+{
+  environment.systemPackages = [ restore-network ];
+
+  # The firewall starts before the network. AdGuard starts after the network
+  # and creates its user then. Waiting for AdGuard from the firewall makes a
+  # systemd ordering loop, so the DNS lock is a later oneshot. If the user is
+  # still missing, the firewall continues without the lock.
+  systemd.services.nixos-dns-lock = {
+    description = "Install the AdGuard DNS lock";
+    after = [ "firewall.service" "adguardhome.service" ];
+    wants = [ "adguardhome.service" ];
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStart = "${install-dns-lock}/bin/install-dns-lock";
+    };
+  };
+
+  networking.firewall.extraCommands = "${install-dns-lock}/bin/install-dns-lock";
 
   networking.firewall.extraStopCommands = ''
     iptables -w -D OUTPUT -j nixos-dns-lock 2>/dev/null || true
