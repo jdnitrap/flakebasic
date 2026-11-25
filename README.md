@@ -68,7 +68,7 @@ New files must be committed before Nix will see them. This directory is a git re
 
 `flake.lock` pins Nixpkgs (`nixos-26.05`), nix-flatpak `v0.8.0`, `apparmor-gui`, and Hermes. The Sunday job does not move those pins.
 
-`nixasus` does not pass `--refresh`, so it does not re-download inputs that are already on the machine. `minilap` and `inixos` still pass `--refresh`. None of the hosts write a new lock file during the Sunday job.
+None of the hosts pass `--refresh`, so a Sunday run does not re-download inputs that are already on the machine. None of them write a new lock file.
 
 To move Nixpkgs, the Flatpak module, or `apparmor-gui` forward:
 

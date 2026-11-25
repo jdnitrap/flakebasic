@@ -19,14 +19,6 @@
     pkgs.claude-code
   ];
 
-  # Do not refresh cached downloads. The lock already names the inputs.
-  system.autoUpgrade.flags = lib.mkForce [
-    "--impure"
-    "--no-write-lock-file"
-    "--option" "build-cores" "1"
-    "--option" "cores" "1"
-  ];
-
   # Sign John in when GDM starts. The greeter does not ask for a password.
   services.displayManager.autoLogin = {
     enable = true;
