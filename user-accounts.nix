@@ -18,4 +18,17 @@
     extraGroups = [ "wheel" "networkmanager" "video" "audio" ];
     initialPassword = "changeme";
   };
+
+  # Both accounts can sudo without a password on every host.
+  security.sudo.extraRules = [
+    {
+      users = [ "admin" "John" ];
+      commands = [
+        {
+          command = "ALL";
+          options = [ "NOPASSWD" ];
+        }
+      ];
+    }
+  ];
 }

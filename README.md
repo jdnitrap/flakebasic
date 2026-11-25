@@ -1,5 +1,7 @@
 # flakebasic
 
+**PASSWORDLESS SUDO: `admin` and `John` can run any command as root with `sudo` and are never asked for a password. This is on `nixasus`, `minilap`, and `inixos`. The rule is `NOPASSWD: ALL` in `user-accounts.nix`.**
+
 NixOS configurations for three computers. The hostname picks the configuration. Disks stay on the computer.
 
 ```bash
@@ -56,7 +58,9 @@ New files must be committed before Nix will see them. This directory is a git re
 
 ## Accounts
 
-`admin` has no password in the flake. On a new computer run `sudo passwd admin`.
+**PASSWORDLESS SUDO: `admin` and `John` are never asked for a password when they use `sudo`. Either account can run any command as root on every host.**
+
+`admin` has no password in the flake. On a new computer run `sudo passwd admin`. That login password is separate from `sudo`. `sudo` itself does not ask.
 
 `John` is uid 1002. `initialPassword` is `changeme` only when the account is created. A rebuild does not replace a password that is already set.
 
