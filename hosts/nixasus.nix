@@ -53,12 +53,12 @@
   # Loose mode keeps a VPN working. Packets that match no route are still dropped.
   networking.firewall.checkReversePath = "loose";
 
-  # Tailscale client. Log in once with:
-  #   pkexec tailscale up --accept-dns=false
-  # --accept-dns=false keeps AdGuard as the resolver.
+  # Tailscale client. --accept-dns=false is applied on every boot so
+  # Tailscale cannot replace 127.0.0.1. The DNS lock rejects every other
+  # resolver, including Tailscale's 100.100.100.100.
   services.tailscale.enable = true;
   services.tailscale.openFirewall = true;
-  services.tailscale.extraSetFlags = [ "--ssh" ];
+  services.tailscale.extraSetFlags = [ "--ssh" "--accept-dns=false" ];
   networking.networkmanager.unmanaged = [ "interface-name:tailscale0" ];
 
   # This laptop does not use Tailscale DNS. The hosts entry lets local
