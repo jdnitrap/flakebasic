@@ -16,7 +16,7 @@ Every host gets AdGuard, printing, sound, laptop power, the `admin` and `John` a
 
 | Host | Desktop | Only on that host |
 | --- | --- | --- |
-| `nixasus` | GNOME, John signs in automatically | Tailscale SSH, OpenSSH with passwords off, DNS lock, OpenSnitch, Ollama, Hermes, Podman, Distrobox, virt-manager |
+| `nixasus` | GNOME, John signs in automatically | Tailscale SSH, OpenSSH with passwords off, DNS lock, OpenSnitch, Ollama, Hermes, Grok Build, Claude Code, Podman, Distrobox, virt-manager |
 | `minilap` | GNOME | nothing else |
 | `inixos` | Cinnamon, LightDM | Nextcloud, published with Tailscale Serve |
 
@@ -27,6 +27,15 @@ sudo ln -sf /etc/nixos/hardware-configuration.nix /etc/nixos/hardware.nix
 ```
 
 `nixos-generate-config` rewrites `hardware-configuration.nix`. The link is what the flake reads. Do not copy that file into the repository.
+
+## Grok and Claude
+
+Only `nixasus` installs these. They are in `hosts/nixasus.nix`:
+
+- `pkgs.grok-build` provides the `grok` command.
+- `pkgs.claude-code` provides the `claude` command.
+
+Both are unfree. `system-packages.nix` already sets `nixpkgs.config.allowUnfree = true`, so the rebuild is allowed to install them. `minilap` and `inixos` do not get either package. A copy of Grok already in a home directory is separate from the system package.
 
 ## Change a setting
 

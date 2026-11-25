@@ -14,6 +14,11 @@
 
   networking.hostName = "nixasus";
 
+  environment.systemPackages = [
+    pkgs.grok-build
+    pkgs.claude-code
+  ];
+
   # Do not refresh cached downloads. The lock already names the inputs.
   system.autoUpgrade.flags = lib.mkForce [
     "--impure"
