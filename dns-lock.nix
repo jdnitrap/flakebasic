@@ -29,20 +29,62 @@ let
     echo "Or pick the previous generation in the boot menu."
   '';
 
+  # nix and nixos-rebuild are the only programs that may skip AdGuard.
+  # Their wrappers are setgid to this group. The nix daemon is a member too.
+  # Nobody else is. The resolvers are IPs, so this path still works when
+  # AdGuard is down and no other name can be looked up.
+  nix-resolv = pkgs.writeText "nix-resolv.conf" ''
+    nameserver 1.1.1.1
+    nameserver 9.9.9.9
+  '';
+
+  wrap-nix = real: pkgs.writeShellScriptBin (baseNameOf real) ''
+    set +e
+    ${pkgs.util-linux}/bin/unshare --user --mount --map-root-user ${pkgs.bash}/bin/bash -c '
+      if ! mount --bind "$1" /etc/resolv.conf; then
+        exit 86
+      fi
+      shift
+      exec "$@"
+    ' _ ${nix-resolv} ${real} "$@"
+    status=$?
+    set -e
+    if [ "$status" -eq 86 ]; then
+      echo "nix direct DNS was not available; using the system resolver" >&2
+      exec ${real} "$@"
+    fi
+    exit "$status"
+  '';
+
   # Installed by the firewall when the AdGuard user already exists, and again
   # by nixos-dns-lock.service once that user has been created at boot.
   install-dns-lock = pkgs.writeShellScriptBin "install-dns-lock" ''
-    export PATH="${pkgs.iptables}/bin:${pkgs.coreutils}/bin:$PATH"
+    export PATH="${pkgs.iptables}/bin:${pkgs.coreutils}/bin:${pkgs.glibc}/bin:$PATH"
     aguid=$(id -u adguardhome 2>/dev/null || true)
     if [ -z "$aguid" ]; then
       echo "adguardhome user is not available yet; DNS lock was not installed" >&2
       exit 0
     fi
+    ngid=$(getent group nix-direct | cut -d: -f3 || true)
+
+    allow_nix_dns() {
+      family="$1"
+      shift
+      if [ -z "$ngid" ]; then
+        return 0
+      fi
+      for ip in "$@"; do
+        "$family" -w -A nixos-dns-lock -m owner --gid-owner "$ngid" --suppl-groups -d "$ip" -p udp --dport 53 -j RETURN
+        "$family" -w -A nixos-dns-lock -m owner --gid-owner "$ngid" --suppl-groups -d "$ip" -p tcp --dport 53 -j RETURN
+      done
+    }
+
     iptables -w -N nixos-dns-lock 2>/dev/null || true
     iptables -w -F nixos-dns-lock
     iptables -w -A nixos-dns-lock -o lo -j RETURN
     iptables -w -A nixos-dns-lock -m owner --uid-owner "$aguid" -p udp --dport 53 -j RETURN
     iptables -w -A nixos-dns-lock -m owner --uid-owner "$aguid" -p tcp --dport 53 -j RETURN
+    allow_nix_dns iptables 1.1.1.1 9.9.9.9
     iptables -w -A nixos-dns-lock -p udp --dport 53 -j REJECT
     iptables -w -A nixos-dns-lock -p tcp --dport 53 -j REJECT
     iptables -w -A nixos-dns-lock -p udp --dport 853 -j REJECT
@@ -54,6 +96,7 @@ let
     ip6tables -w -A nixos-dns-lock -o lo -j RETURN
     ip6tables -w -A nixos-dns-lock -m owner --uid-owner "$aguid" -p udp --dport 53 -j RETURN
     ip6tables -w -A nixos-dns-lock -m owner --uid-owner "$aguid" -p tcp --dport 53 -j RETURN
+    allow_nix_dns ip6tables 2606:4700:4700::1111 2620:fe::fe
     ip6tables -w -A nixos-dns-lock -p udp --dport 53 -j REJECT
     ip6tables -w -A nixos-dns-lock -p tcp --dport 53 -j REJECT
     ip6tables -w -A nixos-dns-lock -p udp --dport 853 -j REJECT
@@ -63,6 +106,30 @@ let
 in
 {
   environment.systemPackages = [ restore-network ];
+
+  users.groups.nix-direct = {};
+
+  # /run/wrappers/bin is ahead of the normal path, including for sudo.
+  # The wrapper file is setgid, so only that process may use the direct resolvers.
+  security.wrappers.nix = {
+    source = "${wrap-nix "${pkgs.nix}/bin/nix"}/bin/nix";
+    owner = "root";
+    group = "nix-direct";
+    setgid = true;
+    permissions = "u+rx,g+rx,o+rx";
+  };
+  security.wrappers.nixos-rebuild = {
+    source = "${wrap-nix "${pkgs.nixos-rebuild}/bin/nixos-rebuild"}/bin/nixos-rebuild";
+    owner = "root";
+    group = "nix-direct";
+    setgid = true;
+    permissions = "u+rx,g+rx,o+rx";
+  };
+
+  systemd.services.nix-daemon.serviceConfig = {
+    SupplementaryGroups = [ "nix-direct" ];
+    BindReadOnlyPaths = [ "${nix-resolv}:/etc/resolv.conf" ];
+  };
 
   # The firewall starts before the network. AdGuard starts after the network
   # and creates its user then. Waiting for AdGuard from the firewall makes a

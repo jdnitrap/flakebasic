@@ -18,7 +18,7 @@ Every host gets AdGuard, printing, sound, laptop power, the `admin` and `John` a
 
 | Host | Desktop | Only on that host |
 | --- | --- | --- |
-| `nixasus` | GNOME, John signs in automatically | Tailscale SSH, OpenSSH with passwords off, DNS lock, OpenSnitch, Ollama, Hermes, Grok Build, Claude Code, Podman, Distrobox, virt-manager |
+| `nixasus` | GNOME, John signs in automatically | Tailscale SSH, OpenSSH with passwords off, DNS lock, Nix DNS bypass, OpenSnitch, Ollama, Hermes, Grok Build, Claude Code, Podman, Distrobox, virt-manager |
 | `minilap` | GNOME | nothing else |
 | `inixos` | Cinnamon, LightDM, John signs in automatically | Nextcloud, published with Tailscale Serve |
 
@@ -38,6 +38,10 @@ Only `nixasus` installs these. They are in `hosts/nixasus.nix`:
 - `pkgs.claude-code` provides the `claude` command.
 
 Both are unfree. `system-packages.nix` already sets `nixpkgs.config.allowUnfree = true`, so the rebuild is allowed to install them. `minilap` and `inixos` do not get either package. A copy of Grok already in a home directory is separate from the system package.
+
+## Nix when AdGuard is down
+
+On `nixasus` the DNS lock rejects lookups that are not from AdGuard. `nix` and `nixos-rebuild` are the exception. Those two commands use `1.1.1.1` and `9.9.9.9` directly, and the nix daemon does too. Other programs do not. Tailscale is started with `--accept-dns=false` so it cannot replace `127.0.0.1`. If a boot still has no DNS at all, `restore-network` removes the lock until the next reboot, and the boot menu has the previous generation.
 
 ## Change a setting
 
