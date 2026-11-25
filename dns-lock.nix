@@ -3,7 +3,7 @@
 # the machine only as the adguardhome user (its plain-DNS fallback). Port 853
 # (DNS-over-TLS) is refused. HTTPS is left to each program.
 
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 
 let
   # Immediate, offline undo. A firewall reload or reboot puts the lock back.
@@ -59,13 +59,13 @@ let
   # Installed by the firewall when the AdGuard user already exists, and again
   # by nixos-dns-lock.service once that user has been created at boot.
   install-dns-lock = pkgs.writeShellScriptBin "install-dns-lock" ''
-    export PATH="${pkgs.iptables}/bin:${pkgs.coreutils}/bin:${pkgs.glibc}/bin:$PATH"
+    export PATH="${pkgs.iptables}/bin:${pkgs.coreutils}/bin:$PATH"
     aguid=$(id -u adguardhome 2>/dev/null || true)
     if [ -z "$aguid" ]; then
       echo "adguardhome user is not available yet; DNS lock was not installed" >&2
       exit 0
     fi
-    ngid=$(getent group nix-direct | cut -d: -f3 || true)
+    ngid=$(${lib.getOutput "getent" pkgs.glibc}/bin/getent group nix-direct | cut -d: -f3 || true)
 
     allow_nix_dns() {
       family="$1"
