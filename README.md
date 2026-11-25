@@ -30,7 +30,7 @@ sudo ln -sf /etc/nixos/hardware-configuration.nix /etc/nixos/hardware.nix
 
 ## Change a setting
 
-Edit the file, commit, and push. The 19:00 job builds `github:jdnitrap/flakebasic#<hostname>`. Until the push, that job still has the old files.
+Edit the file, commit, and push. The Sunday 3 AM job builds `github:jdnitrap/flakebasic#<hostname>`. Until the push, that job still has the old files.
 
 A setting for one computer goes in `hosts/<name>.nix`. A setting for all computers goes in a module imported by `configuration.nix`.
 
@@ -53,9 +53,9 @@ New files must be committed before Nix will see them. This directory is a git re
 
 ## Updates and the lock
 
-`flake.lock` pins Nixpkgs (`nixos-26.05`), nix-flatpak `v0.8.0`, `apparmor-gui`, and Hermes. The nightly job does not move those pins.
+`flake.lock` pins Nixpkgs (`nixos-26.05`), nix-flatpak `v0.8.0`, `apparmor-gui`, and Hermes. The Sunday job does not move those pins.
 
-`nixasus` does not pass `--refresh`, so it does not re-download inputs that are already on the machine. `minilap` and `inixos` still pass `--refresh`. None of the hosts write a new lock file during the nightly job.
+`nixasus` does not pass `--refresh`, so it does not re-download inputs that are already on the machine. `minilap` and `inixos` still pass `--refresh`. None of the hosts write a new lock file during the Sunday job.
 
 To move Nixpkgs, the Flatpak module, or `apparmor-gui` forward:
 
@@ -66,7 +66,7 @@ git commit -m "Update nixpkgs"
 git push
 ```
 
-Replace `nixpkgs` with `nix-flatpak` or `apparmor-gui` to move just that input. The next 19:00 run, or a manual rebuild, then downloads the new commit if it is not already present.
+Replace `nixpkgs` with `nix-flatpak` or `apparmor-gui` to move just that input. The next Sunday 3 AM run, or a manual rebuild, then downloads the new commit if it is not already present.
 
 Hermes stays on the stable tag named in `flake.nix` (`v0.23.4`). A newer stable release is a new tag, not an update of the old one. Change the tag in `flake.nix`, then:
 

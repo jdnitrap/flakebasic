@@ -6,7 +6,7 @@
   system.autoUpgrade = {
     enable = true;
     persistent = true;
-    dates = "19:00";
+    dates = "Sun 03:00";
     randomizedDelaySec = "0";
     allowReboot = false;
     flake = "github:jdnitrap/flakebasic#${config.networking.hostName}";
@@ -38,7 +38,7 @@
         user=$(id -nu "$uid" 2>/dev/null || true)
         [ -n "$user" ] || continue
         sudo -u "$user" DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$uid/bus" \
-          notify-send "NixOS update" "The 7 PM system update finished." || true
+          notify-send "NixOS update" "The Sunday 3 AM system update finished." || true
       done
     '';
   };
