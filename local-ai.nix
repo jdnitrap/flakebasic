@@ -29,7 +29,11 @@
     wantedBy = [ "multi-user.target" ];
     after = [ "ollama.service" "network-online.target" ];
     wants = [ "ollama.service" ];
-    serviceConfig.Type = "oneshot";
+    serviceConfig = {
+      Type = "oneshot";
+      # The ollama command panics when HOME is unset.
+      Environment = "HOME=/root";
+    };
     script = ''
       export OLLAMA_HOST=127.0.0.1:11434
       for model in gpt-oss:20b qwen3.5:9b; do

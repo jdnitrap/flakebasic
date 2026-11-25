@@ -32,8 +32,19 @@ in
 {
   environment.systemPackages = [ restore-network ];
 
+  # The adguardhome user is created when that service starts. The firewall
+  # must wait for it, or `id` fails and the whole firewall aborts.
+  systemd.services.firewall = {
+    after = [ "adguardhome.service" ];
+    wants = [ "adguardhome.service" ];
+  };
+
   networking.firewall.extraCommands = ''
-    aguid=$(id -u adguardhome)
+    aguid=$(id -u adguardhome 2>/dev/null || true)
+    if [ -z "$aguid" ]; then
+      echo "adguardhome user is not available; DNS lock was not installed" >&2
+      exit 1
+    fi
     iptables -w -N nixos-dns-lock 2>/dev/null || true
     iptables -w -F nixos-dns-lock
     iptables -w -A nixos-dns-lock -o lo -j RETURN
