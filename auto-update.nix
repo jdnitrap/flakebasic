@@ -31,6 +31,8 @@
       Nice = 19;
       IOSchedulingClass = "idle";
       CPUSchedulingPolicy = "idle";
+      # An old computer may build for hours. Do not stop the job on a timer.
+      TimeoutStartSec = "infinity";
     };
     postStart = ''
       for uid in $(ls /run/user 2>/dev/null || true); do
@@ -38,8 +40,11 @@
         user=$(id -nu "$uid" 2>/dev/null || true)
         [ -n "$user" ] || continue
         sudo -u "$user" DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$uid/bus" \
-          notify-send "NixOS update" "The Sunday 3 AM system update finished." || true
+          notify-send "NixOS update" "The Sunday update finished. The computer will reboot in 30 minutes." || true
       done
+      # This runs only after nixos-rebuild exits successfully. The reboot
+      # waits another 30 minutes so a slow machine is not restarted mid-build.
+      ${pkgs.systemd}/bin/shutdown -r +30
     '';
   };
 }

@@ -8,7 +8,7 @@ NixOS configurations for three computers. The hostname picks the configuration. 
 sudo nixos-rebuild boot --flake github:jdnitrap/flakebasic#nixasus --impure
 ```
 
-Use `#minilap` or `#inixos` on those machines. `--impure` is required because the flake reads `/etc/nixos/hardware.nix` from the computer being built. `boot` installs the generation and does not switch to it until the next reboot. Use `switch` instead of `boot` to apply it immediately.
+Use `#minilap` or `#inixos` on those machines. `--impure` is required because the flake reads `/etc/nixos/hardware.nix` from the computer being built. `boot` installs the generation and does not switch to it until the next reboot. Use `switch` instead of `boot` to apply it immediately. The Sunday job reboots 30 minutes after a successful build. A slow build is allowed to finish first.
 
 ## Layout
 
