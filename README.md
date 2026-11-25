@@ -18,7 +18,7 @@ Every host gets AdGuard, printing, sound, laptop power, the `admin` and `John` a
 | --- | --- | --- |
 | `nixasus` | GNOME, John signs in automatically | Tailscale SSH, OpenSSH with passwords off, DNS lock, OpenSnitch, Ollama, Hermes, Grok Build, Claude Code, Podman, Distrobox, virt-manager |
 | `minilap` | GNOME | nothing else |
-| `inixos` | Cinnamon, LightDM | Nextcloud, published with Tailscale Serve |
+| `inixos` | Cinnamon, LightDM, John signs in automatically | Nextcloud, published with Tailscale Serve |
 
 Hardware is not in this repository. On each computer:
 
