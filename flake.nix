@@ -27,7 +27,7 @@
             # Disks, firmware, and kernel modules for this computer.
             # Same path on every machine. Not stored in the flake.
             # nixos-rebuild needs --impure to read it.
-            /etc/nixos/hardware.nix
+#            /etc/nixos/hardware.nix
           ];
         });
     };
