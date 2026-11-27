@@ -1,97 +1,33 @@
 # flakebasic
 
-**PASSWORDLESS SUDO: `admin` and `John` can run any command as root with `sudo` and are never asked for a password. This is on `nixasus`, `minilap`, and `inixos`. The rule is `NOPASSWD: ALL` in `user-accounts.nix`.**
-
-NixOS configurations for three computers. The hostname picks the configuration. Disks stay on the computer.
+NixOS for three computers. The hostname after `#` picks the computer.
 
 ```bash
 sudo nixos-rebuild boot --flake github:jdnitrap/flakebasic#nixasus --impure
 ```
 
-Use `#minilap` or `#inixos` on those machines. `--impure` is required because the flake reads `/etc/nixos/hardware-configuration.nix` from the computer being built. `boot` installs the generation and does not switch to it until the next reboot. Use `switch` instead of `boot` to apply it immediately. The Sunday job reboots 30 minutes after a successful build. A slow build is allowed to finish first.
+Use `#minilap` or `#inixos` on those machines. `--impure` is required because the flake reads `/etc/nixos/hardware-configuration.nix` from the computer being built. `boot` installs the generation and applies it on the next reboot.
 
-## Layout
+A longer explanation is in `/home/John/flakebasic-guide.md` on nixasus. It is not part of this repository.
 
-`flake.nix` lists the hosts and the pinned inputs. `configuration.nix` imports the modules that every host gets. `hosts/<name>.nix` is only that computer.
+## Where to look
 
-Every host gets AdGuard, printing, sound, laptop power, the `admin` and `John` accounts, the AppArmor window, Zen, and Firefox.
+`flake.nix` only names the downloads (Nixpkgs, Flatpak, Hermes). Every other file is loaded automatically from `modules/`.
 
-| Host | Desktop | Only on that host |
+`modules/computers.nix` is the menu. A feature does nothing until a computer lists it.
+
+`modules/features/` is one topic per file. The computer menu decides which files apply.
+
+## What each computer uses
+
+| Computer | Desktop | Extra features |
 | --- | --- | --- |
-| `nixasus` | GNOME, John signs in automatically | Tailscale SSH, OpenSSH with passwords off, DNS lock, Nix DNS bypass, OpenSnitch, Ollama, Hermes, Grok Build, Claude Code, Podman, Distrobox, virt-manager |
-| `minilap` | GNOME | nothing else |
-| `inixos` | Cinnamon, LightDM, John signs in automatically | Nextcloud, published with Tailscale Serve |
+| nixasus | GNOME, John signs in automatically | DNS lock, OpenSnitch, Ollama, Hermes, Grok, Claude, Podman, virtual machines, Bluetooth, OpenSSH, Tailscale SSH |
+| minilap | GNOME | nothing else |
+| inixos | Cinnamon, LightDM, John signs in automatically | Tailscale, Nextcloud |
 
-Hardware is not in this repository. `nixos-generate-config` writes `/etc/nixos/hardware-configuration.nix` on each computer. A rebuild with `--impure` imports that file. Without `--impure` the flake cannot see it. Do not copy that file into the repository.
+These files exist and are not on any computer until you add them in `modules/computers.nix`: AdGuard, AppArmor, Bluetooth with Blueman, Plasma, the Sunday update, and the account service.
 
-## Grok and Claude
+`admin` and `John` can run `sudo` without a password on every computer. The rule is in `modules/features/users.nix`.
 
-Only `nixasus` installs these. They are in `hosts/nixasus.nix`:
-
-- `pkgs.grok-build` provides the `grok` command.
-- `pkgs.claude-code` provides the `claude` command.
-
-Both are unfree. `system-packages.nix` already sets `nixpkgs.config.allowUnfree = true`, so the rebuild is allowed to install them. `minilap` and `inixos` do not get either package. A copy of Grok already in a home directory is separate from the system package.
-
-## Nix when AdGuard is down
-
-On `nixasus` the DNS lock rejects lookups that are not from AdGuard. `nix` and `nixos-rebuild` are the exception. Those two commands use `1.1.1.1` and `9.9.9.9` directly, and the nix daemon does too. Other programs do not. Tailscale is started with `--accept-dns=false` so it cannot replace `127.0.0.1`. If a boot still has no DNS at all, `restore-network` removes the lock until the next reboot, and the boot menu has the previous generation.
-
-## Change a setting
-
-Edit the file, commit, and push. The Sunday 3 AM job builds `github:jdnitrap/flakebasic#<hostname>`. Until the push, that job still has the old files.
-
-A setting for one computer goes in `hosts/<name>.nix`. A setting for all computers goes in a module imported by `configuration.nix`.
-
-Shared files set some options with `mkDefault`, so a host file can replace them. `networking.nix` does this for OpenSSH and the reverse-path check. A host that sets the same option without `mkDefault` wins. Two plain assignments of different values make the build fail.
-
-New files must be committed before Nix will see them. This directory is a git repo, and Nix copies only tracked files.
-
-## Add a computer
-
-1. Add the hostname to `hosts` in `flake.nix`.
-2. Create `hosts/<name>.nix` with `networking.hostName` and the desktop import (`../gnome.nix` or `../cinnamon.nix`).
-3. On that computer, run `nixos-generate-config` so `/etc/nixos/hardware-configuration.nix` exists.
-4. Commit, push, then rebuild with that hostname.
-
-## Accounts
-
-**PASSWORDLESS SUDO: `admin` and `John` are never asked for a password when they use `sudo`. Either account can run any command as root on every host.**
-
-`admin` has no password in the flake. On a new computer run `sudo passwd admin`. That login password is separate from `sudo`. `sudo` itself does not ask.
-
-`John` is uid 1002. `initialPassword` is `changeme` only when the account is created. A rebuild does not replace a password that is already set.
-
-## Updates and the lock
-
-`flake.lock` pins Nixpkgs (`nixos-26.05`), nix-flatpak `v0.8.0`, `apparmor-gui`, and Hermes. The Sunday job does not move those pins.
-
-None of the hosts pass `--refresh`, so a Sunday run does not re-download inputs that are already on the machine. None of them write a new lock file.
-
-To move Nixpkgs, the Flatpak module, or `apparmor-gui` forward:
-
-```bash
-nix flake update nixpkgs
-git add flake.lock
-git commit -m "Update nixpkgs"
-git push
-```
-
-Replace `nixpkgs` with `nix-flatpak` or `apparmor-gui` to move just that input. The next Sunday 3 AM run, or a manual rebuild, then downloads the new commit if it is not already present.
-
-Hermes stays on the stable tag named in `flake.nix` (`v0.23.4`). A newer stable release is a new tag, not an update of the old one. Change the tag in `flake.nix`, then:
-
-```bash
-nix flake update hermes-agent
-git add flake.nix flake.lock
-git commit -m "Update Hermes"
-git push
-```
-
-Do not point Hermes at `main`. That is not the stable release.
-
-Hermes models `gpt-oss:20b` and `qwen3.5:9b` download only when `ollama show` says one is missing. A rebuild does not download them again.
-
-## What does not belong here
-
-Passwords, Tailscale auth keys, and `/etc/nixos/hardware-configuration.nix` stay on the computer. `~/.hermes` stays in John's home directory. The public `apparmor-gui` flake has no hostname and no username. This repo only turns that module on.
+Disks stay in `/etc/nixos/hardware-configuration.nix` on each computer. Do not copy that file into this repository.
