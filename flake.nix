@@ -14,6 +14,12 @@
     let
       system = "x86_64-linux";
       hosts = [ "nixasus" "minilap" "inixos" ];
+      # Written by nixos-generate-config on the computer being built.
+      # Visible only with --impure. The flake does not store this file.
+      hostHardware = /etc/nixos/hardware-configuration.nix;
+      hostHardwareFound =
+        let result = builtins.tryEval (builtins.pathExists hostHardware);
+        in result.success && result.value;
     in {
       nixosConfigurations = nixpkgs.lib.genAttrs hosts (hostName:
         nixpkgs.lib.nixosSystem {
@@ -24,11 +30,7 @@
 #            apparmor-gui.nixosModules.default
             ./configuration.nix
             ./hosts/${hostName}.nix
-            # Disks, firmware, and kernel modules for this computer.
-            # Same path on every machine. Not stored in the flake.
-            # nixos-rebuild needs --impure to read it.
-#            /etc/nixos/hardware.nix
-          ];
+          ] ++ nixpkgs.lib.optional hostHardwareFound hostHardware;
         });
     };
 }

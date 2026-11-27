@@ -31,7 +31,15 @@ imports =
     ];
 
   # Hostname stays in hosts/<name>.nix.
-  # Hardware is /etc/nixos/hardware.nix on the computer being built.
+  # Disks come from /etc/nixos/hardware-configuration.nix on the computer
+  # being built. nixos-rebuild needs --impure to read that file.
+  # This default only lets the flake evaluate when that file is not visible.
+  # The generated file sets the same option without mkDefault and replaces it.
+  fileSystems."/" = lib.mkDefault {
+    device = "tmpfs";
+    fsType = "tmpfs";
+  };
+
   # Desktop stays in the host file. Nextcloud is only imported by inixos.
 
   # The window comes from github:jdnitrap/apparmor-gui.

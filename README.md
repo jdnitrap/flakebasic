@@ -8,7 +8,7 @@ NixOS configurations for three computers. The hostname picks the configuration. 
 sudo nixos-rebuild boot --flake github:jdnitrap/flakebasic#nixasus --impure
 ```
 
-Use `#minilap` or `#inixos` on those machines. `--impure` is required because the flake reads `/etc/nixos/hardware.nix` from the computer being built. `boot` installs the generation and does not switch to it until the next reboot. Use `switch` instead of `boot` to apply it immediately. The Sunday job reboots 30 minutes after a successful build. A slow build is allowed to finish first.
+Use `#minilap` or `#inixos` on those machines. `--impure` is required because the flake reads `/etc/nixos/hardware-configuration.nix` from the computer being built. `boot` installs the generation and does not switch to it until the next reboot. Use `switch` instead of `boot` to apply it immediately. The Sunday job reboots 30 minutes after a successful build. A slow build is allowed to finish first.
 
 ## Layout
 
@@ -22,13 +22,7 @@ Every host gets AdGuard, printing, sound, laptop power, the `admin` and `John` a
 | `minilap` | GNOME | nothing else |
 | `inixos` | Cinnamon, LightDM, John signs in automatically | Nextcloud, published with Tailscale Serve |
 
-Hardware is not in this repository. On each computer:
-
-```bash
-sudo ln -sf /etc/nixos/hardware-configuration.nix /etc/nixos/hardware.nix
-```
-
-`nixos-generate-config` rewrites `hardware-configuration.nix`. The link is what the flake reads. Do not copy that file into the repository.
+Hardware is not in this repository. `nixos-generate-config` writes `/etc/nixos/hardware-configuration.nix` on each computer. A rebuild with `--impure` imports that file. Without `--impure` the flake cannot see it. Do not copy that file into the repository.
 
 ## Grok and Claude
 
@@ -57,7 +51,7 @@ New files must be committed before Nix will see them. This directory is a git re
 
 1. Add the hostname to `hosts` in `flake.nix`.
 2. Create `hosts/<name>.nix` with `networking.hostName` and the desktop import (`../gnome.nix` or `../cinnamon.nix`).
-3. On that computer, create the `/etc/nixos/hardware.nix` link.
+3. On that computer, run `nixos-generate-config` so `/etc/nixos/hardware-configuration.nix` exists.
 4. Commit, push, then rebuild with that hostname.
 
 ## Accounts
@@ -100,4 +94,4 @@ Hermes models `gpt-oss:20b` and `qwen3.5:9b` download only when `ollama show` sa
 
 ## What does not belong here
 
-Passwords, Tailscale auth keys, and `/etc/nixos/hardware.nix` stay on the computer. `~/.hermes` stays in John's home directory. The public `apparmor-gui` flake has no hostname and no username. This repo only turns that module on.
+Passwords, Tailscale auth keys, and `/etc/nixos/hardware-configuration.nix` stay on the computer. `~/.hermes` stays in John's home directory. The public `apparmor-gui` flake has no hostname and no username. This repo only turns that module on.
