@@ -31,18 +31,18 @@
   hardware.bluetooth.enable = true;
   hardware.bluetooth.powerOnBoot = true;
 
-  # This machine's bluetoothd profile is disabled. The shared profiles stay.
-  security.apparmor.policies."bin.bluetoothd" = {
-    state = "disable";
-    profile = ''
-      include <tunables/global>
-      profile bluetoothd /run/current-system/sw/bin/bluetoothd flags=(attach_disconnected) {
-        include <abstractions/base>
-        include <abstractions/nameservice>
-        /run/current-system/sw/bin/bluetoothd mr,
-      }
-    '';
-  };
+#  # This machine's bluetoothd profile is disabled. The shared profiles stay.
+#  security.apparmor.policies."bin.bluetoothd" = {
+#    state = "disable";
+#    profile = ''
+#      include <tunables/global>
+#      profile bluetoothd /run/current-system/sw/bin/bluetoothd flags=(attach_disconnected) {
+#        include <abstractions/base>
+#        include <abstractions/nameservice>
+#        /run/current-system/sw/bin/bluetoothd mr,
+#      }
+#    '';
+#  };
 
   # OpenSSH stays up for the local network, but it accepts no passwords
   # and no keyboard-interactive logins. Tailscale SSH is the remote login.
@@ -64,7 +64,7 @@
   # This laptop does not use Tailscale DNS. The hosts entry lets local
   # programs open Nextcloud by its tailnet name.
   networking.extraHosts = ''
-    100.112.170.12 hostname.tail6cea4d.ts.net
+
     100.98.170.29 inixos.tail6cea4d.ts.net
   '';
 }

@@ -21,12 +21,12 @@ imports =
 	./networking.nix
 	./user-accounts.nix
 	./flatpak.nix
-	./auto-update.nix
+#	./auto-update.nix
 	./experimental-features.nix
 	./laptop.nix
-	./apparmor.nix
-	./auto-login.nix
-	./adguard.nix
+#	./apparmor.nix
+#	./auto-login.nix
+#	./adguard.nix
 
     ];
 
@@ -35,6 +35,6 @@ imports =
   # Desktop stays in the host file. Nextcloud is only imported by inixos.
 
   # The window comes from github:jdnitrap/apparmor-gui.
-  services.apparmor-gui.enable = true;
+ # services.apparmor-gui.enable = true;
 
 }
