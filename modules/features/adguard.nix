@@ -25,6 +25,8 @@
           upstream_dns = [
             "https://9.9.9.9/dns-query"
             "https://149.112.112.112/dns-query"
+            # Nextcloud's tailnet name. Tailscale's resolver answers only this zone.
+            "[/tail6cea4d.ts.net/]100.100.100.100"
           ];
           fallback_dns = [
             "9.9.9.9"

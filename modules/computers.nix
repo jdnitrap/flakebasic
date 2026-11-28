@@ -54,6 +54,7 @@ in
       features.tailscale
       features.nixasus-tailscale
       features.assistants
+      features.adguard
       features.dns-lock
       features.opensnitch
       features.local-ai

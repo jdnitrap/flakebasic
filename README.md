@@ -24,11 +24,11 @@ A longer explanation is in `/home/John/flakebasic-guide.md` on nixasus. It is no
 
 | Computer | Desktop | Extra features |
 | --- | --- | --- |
-| nixasus | GNOME, John signs in automatically | DNS lock, OpenSnitch, Ollama, Hermes, Grok, Claude, Podman, virtual machines, Bluetooth, OpenSSH, Tailscale SSH |
+| nixasus | GNOME, John signs in automatically | AdGuard, DNS lock, OpenSnitch, Ollama, Hermes, Grok, Claude, Podman, virtual machines, Bluetooth, OpenSSH, Tailscale SSH |
 | ilenovo | GNOME | nothing else |
 | inixos | Cinnamon, LightDM, John signs in automatically | Tailscale, Nextcloud, OnlyOffice, Bluetooth |
 
-These files exist and are not on any computer until you add them in `modules/computers.nix`: AdGuard, AppArmor, Plasma, the Sunday update, and the account service.
+These files exist and are not on any computer until you add them in `modules/computers.nix`: AppArmor, Plasma, the Sunday update, and the account service.
 
 `admin` and `John` can run `sudo` without a password on every computer. The rule is in `modules/features/users.nix`.
 
