@@ -1,5 +1,5 @@
 {
-  description = "NixOS for nixasus, minilap, and inixos";
+  description = "NixOS for nixasus, ilenovo, and inixos";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";

@@ -10,6 +10,7 @@
       isNormalUser = true;
       description = "Admin";
       extraGroups = [ "wheel" "networkmanager" "video" "audio" ];
+      initialPassword = "changeme";
     };
 
     users.users.John = {

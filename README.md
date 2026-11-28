@@ -6,7 +6,7 @@ NixOS for three computers. The hostname after `#` picks the computer.
 sudo nixos-rebuild boot --flake github:jdnitrap/flakebasic#nixasus --impure
 ```
 
-Use `#minilap` or `#inixos` on those machines. `--impure` is required because the flake reads `/etc/nixos/hardware-configuration.nix` from the computer being built. `boot` installs the generation and applies it on the next reboot.
+Use `#ilenovo` or `#inixos` on those machines. `--impure` is required because the flake reads `/etc/nixos/hardware-configuration.nix` from the computer being built. `boot` installs the generation and applies it on the next reboot.
 
 A longer explanation is in `/home/John/flakebasic-guide.md` on nixasus. It is not part of this repository.
 
@@ -23,7 +23,7 @@ A longer explanation is in `/home/John/flakebasic-guide.md` on nixasus. It is no
 | Computer | Desktop | Extra features |
 | --- | --- | --- |
 | nixasus | GNOME, John signs in automatically | DNS lock, OpenSnitch, Ollama, Hermes, Grok, Claude, Podman, virtual machines, Bluetooth, OpenSSH, Tailscale SSH |
-| minilap | GNOME | nothing else |
+| ilenovo | GNOME | nothing else |
 | inixos | Cinnamon, LightDM, John signs in automatically | Tailscale, Nextcloud |
 
 These files exist and are not on any computer until you add them in `modules/computers.nix`: AdGuard, AppArmor, Bluetooth with Blueman, Plasma, the Sunday update, and the account service.

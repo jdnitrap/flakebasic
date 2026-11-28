@@ -10,13 +10,14 @@ let
   hardwareCheck = builtins.tryEval (builtins.pathExists hardwareFile);
   hardwareFound = hardwareCheck.success && hardwareCheck.value;
 
-  everyComputer = [
-    features."fallback-root"
-    features."hardware-support"
+  everyComputer =
+  [
+    features.fallback-root
+    features.hardware-support
     features.printing
     features.locale
     features.sound
-    features."state-version"
+    features.state-version
     features.packages
     features.boot
     features.networking
@@ -42,32 +43,38 @@ let
 in
 {
   flake.nixosConfigurations = {
-    nixasus = computer "nixasus" [
+    nixasus = computer "nixasus"
+    [
       features.gnome
-      features."nixasus-desktop"
+      features.nixasus-desktop
       features.autologin
       features.bluetooth
       features.openssh
-      features."loose-reverse-path"
+      features.loose-reverse-path
       features.tailscale
-      features."nixasus-tailscale"
+      features.nixasus-tailscale
       features.assistants
-      features."dns-lock"
+      features.dns-lock
       features.opensnitch
-      features."local-ai"
+      features.local-ai
       features.containers
     ];
 
-    minilap = computer "minilap" [
+    ilenovo = computer "ilenovo"
+    [
       features.gnome
     ];
 
-    inixos = computer "inixos" [
+    inixos = computer "inixos"
+    [
       features.cinnamon
       features.lightdm
       features.autologin
       features.tailscale
       features.nextcloud
     ];
+
+
+
   };
 }
