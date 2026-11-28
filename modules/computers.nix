@@ -70,8 +70,12 @@ in
       features.cinnamon
       features.lightdm
       features.autologin
+      features.bluetooth
+      features.loose-reverse-path
       features.tailscale
       features.nextcloud
+      features.onlyoffice
+      features.inixos-host
     ];
 
 
