@@ -8,7 +8,7 @@ This file is for a person or an assistant editing the repository. Add a feature 
 
 `modules/computers.nix` is the menu. `everyComputer` is included on nixasus, ilenovo, and inixos. Each computer then adds only the feature names in its own list. The hostname is the name passed to `computer`.
 
-`modules/features/` holds one topic per file. A file there does nothing until a computer lists it. The attribute name is the file name without `.nix`:
+`modules/features/` holds one topic per file, grouped by folder: `system`, `desktop`, `hardware`, `network`, `tailscale`, `security`, `services`, `software`, `users`, and `hosts`. A file there does nothing until a computer lists it. The attribute name is the file name without `.nix`, not the folder name:
 
 ```nix
 {
@@ -28,7 +28,8 @@ List that feature as `features.printing`. A hyphen is part of the name. `feature
 
 - A shared setting goes in a feature file, then into `everyComputer`, only when every computer should have it.
 - A setting for one computer goes in a feature file, then into that computer's list only.
-- Facts about one machine, such as an account id, go in a feature named for that computer, like `inixos-host`. Do not put them in a shared feature.
+- Facts about one machine, such as an account id, go in `modules/features/hosts/`, in a feature named for that computer, like `inixos-host`. Do not put them in a shared feature.
+- A computer-specific change to a shared feature goes in that feature's folder. `tailscale/nixasus-tailscale.nix` is the nixasus Tailscale file. List it only on nixasus.
 - Update the table in `README.md` when a computer's list changes.
 
 ## Leave these out of the repository
