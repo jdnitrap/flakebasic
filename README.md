@@ -18,6 +18,8 @@ A longer explanation is in `/home/John/flakebasic-guide.md` on nixasus. It is no
 
 `modules/features/` is one topic per file. The computer menu decides which files apply.
 
+`AGENTS.md` says to keep this structure when editing the repository.
+
 ## What each computer uses
 
 | Computer | Desktop | Extra features |
